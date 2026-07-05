@@ -418,7 +418,7 @@ const PRODUCTOS = [
   },
   {
     id: 9,
-    nombre: "Alo",
+    nombre: "Aló",
     categoria: "Conjuntos",
     precio: 80000,
     tallas: ["Única"],
@@ -426,6 +426,17 @@ const PRODUCTOS = [
     colores: ["azul rey","palo rosa","celeste","negro","rojo","beis"],
     color: "#1E3A8A",
     imagen: "imagenes/d3542.jpeg"
+  },
+  {
+    id: 10,
+    nombre: "Tulum",
+    categoria: "Enterizos",
+    precio: 88000,
+    tallas: ["Única"],
+    agotadas: [],
+    colores: ["negro","gris oscuro","gris claro","azul oscuro","blanco","cafe","kaki","chocolate"],
+    color: "#3A3A3A",
+    imagen: "imagenes/d3596.jpeg"
   },
 ];
 
@@ -447,7 +458,11 @@ const COLORES_HEX = {
   "azul": "#2F4F8F",
   "gris": "#9C9C94",
   "palo rosa": "#D9A7A0",
-  "rojo": "#B0221B"
+  "rojo": "#B0221B",
+  "gris oscuro": "#4A4A46",
+  "gris claro": "#C9C9C2",
+  "azul oscuro": "#1B2A4A",
+  "kaki": "#8C8A5A"
 };
 
 /* ======================================================
@@ -632,7 +647,7 @@ function hacerPedido(){
   carrito.forEach(item => {
     const p = PRODUCTOS.find(p => p.id === item.productoId);
     const colorTxt = item.color ? ` (${item.color})` : "";
-    mensaje += `• ${p.nombre} - Talla ${item.talla}${colorTxt} x${item.cantidad} - ${formatoCOP(p.precio * item.cantidad)}%0A`;
+    mensaje += `• ${p.nombre} (${p.categoria}) - Talla ${item.talla}${colorTxt} x${item.cantidad} - ${formatoCOP(p.precio * item.cantidad)}%0A`;
   });
   mensaje += `%0ATotal estimado: ${formatoCOP(totalCarrito())}`;
 
