@@ -449,8 +449,15 @@ const COLORES_HEX = {
   "gris oscuro": "#4A4A46",
   "gris claro": "#C9C9C2",
   "azul oscuro": "#1B2A4A",
-  "kaki": "#8C8A5A"
+  "kaki": "#8C8A5A",
+  "verde militar": "#5C6B3A"
 };
+
+// Busca el color ignorando tildes/mayúsculas, para que "café" y "cafe" encuentren el mismo hex
+function obtenerColorHex(nombreColor){
+  const normalizado = nombreColor.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+  return COLORES_HEX[normalizado] || COLORES_HEX[nombreColor] || "#999";
+}
 
 /* ======================================================
    No necesitas editar debajo de esta línea
@@ -517,7 +524,7 @@ function renderGrid(){
     const tieneColores = Array.isArray(p.colores) && p.colores.length > 0;
     const colorsRow = tieneColores ? p.colores.map(c => {
       const selected = sel.color === c;
-      const hex = COLORES_HEX[c] || "#999";
+      const hex = obtenerColorHex(c);
       return `<button class="color-btn ${selected ? 'selected' : ''}" style="background:${hex}"
         title="${c}" onclick="elegirColor(${p.id}, '${c}')"></button>`;
     }).join("") : "";
