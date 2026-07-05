@@ -6,6 +6,7 @@
 <title>Catálogo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   :root{
     --bg:#EDECE6;
@@ -390,57 +391,41 @@
    ⚙️ CONFIGURACIÓN — edita solo esto
    ====================================================== */
 
+// Conexión con la base de datos de Supabase (donde tu hermana va a subir las prendas)
+const SUPABASE_URL = "https://upfglhzvwsdbjmosuscw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nRrAlM6vWRgCKI4tEdiVDQ_6AU6Sv0O";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
 // Número de WhatsApp de tu hermana, formato: código de país + número, sin + ni espacios
 const WHATSAPP_NUMERO = "573248274204"; // <-- CAMBIAR por el número real
 
-// Catálogo de productos. Copia el bloque {...} para agregar más prendas.
-const PRODUCTOS = [
-  
-  {
-    id: 7,
-    nombre: "Ibiza",
-    categoria: "Enterizos",
-    precio: 65000,
-    tallas: ["S","M","L"],
-    agotadas: [],
-    colores: ["negro","celeste","rosado","beis","cafe","verde oliva","verde seco","azul rey"],
-    color: "#1C1C1C",
-    imagen: "imagenes/en3440.jpg"
-  },
-  {
-    id: 8,
-    nombre: "Malibú",
-    categoria: "Conjuntos",
-    precio: 80000,
-    tallas: ["S","M","L"],
-    agotadas: [],
-    colores: ["negro","celeste","rosado","beis","cafe","verde oliva","verde seco","azul rey"],
-    color: "#2F4F8F",
-    imagen: "imagenes/co3447.jpg"
-  },
-  {
-    id: 9,
-    nombre: "Aló",
-    categoria: "Conjuntos",
-    precio: 80000,
-    tallas: ["Única"],
-    agotadas: [],
-    colores: ["azul rey","palo rosa","celeste","negro","rojo","beis"],
-    color: "#1E3A8A",
-    imagen: "imagenes/d3542.jpeg"
-  },
-  {
-    id: 10,
-    nombre: "Tulum",
-    categoria: "Enterizos",
-    precio: 88000,
-    tallas: ["Única"],
-    agotadas: [],
-    colores: ["negro","gris oscuro","gris claro","azul oscuro","blanco","cafe","kaki","chocolate"],
-    color: "#3A3A3A",
-    imagen: "imagenes/d3596.jpeg"
-  },
-];
+// Los productos ahora se cargan desde Supabase (ya no van escritos aquí)
+let PRODUCTOS = [];
+
+async function cargarProductos(){
+  const { data, error } = await supabaseClient
+    .from('productos')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if(error){
+    console.error('Error cargando productos:', error);
+    document.getElementById('grid').innerHTML = '<p style="text-align:center;color:#5B5F55;">No se pudieron cargar los productos. Intenta recargar la página.</p>';
+    return;
+  }
+
+  PRODUCTOS = data.map(p => ({
+    id: p.id,
+    nombre: p.nombre,
+    categoria: p.categoria,
+    precio: p.precio,
+    tallas: p.tallas || [],
+    agotadas: p.agotadas || [],
+    colores: p.colores || [],
+    color: p.color_fondo || "#8E3B46",
+    imagen: p.imagen_url || ""
+  }));
+}
 
 // Mapa de nombre de color -> código hex, para pintar los círculos de color
 const COLORES_HEX = {
@@ -657,9 +642,14 @@ function hacerPedido(){
   window.open(url, "_blank");
 }
 
-renderFiltros();
-renderGrid();
-actualizarCarritoUI();
+async function iniciar(){
+  await cargarProductos();
+  renderFiltros();
+  renderGrid();
+  actualizarCarritoUI();
+}
+
+iniciar();
 </script>
 
 </body>
