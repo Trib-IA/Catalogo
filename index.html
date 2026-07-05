@@ -494,6 +494,7 @@ function renderGrid(){
     img.className = "card-image";
     img.style.background = p.color;
     if(p.imagen){
+      img.style.padding = "0";
       const image = document.createElement("img");
       image.src = p.imagen;
       img.appendChild(image);
