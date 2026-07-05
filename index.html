@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#EDECE6;
+    --card:#FFFFFF;
+    --ink:#20261F;
+    --ink-soft:#5B5F55;
+    --berry:#8E3B46;
+    --berry-dark:#6E2C35;
+    --gold:#B8935A;
+    --sage:#7C8A6E;
+    --line:#DAD8CC;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    padding-bottom:100px;
+  }
+  /* ---------- HEADER ---------- */
+  header{
+    padding:48px 24px 32px;
+    text-align:center;
+    position:relative;
+  }
+  header .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    letter-spacing:0.18em;
+    text-transform:uppercase;
+    color:var(--sage);
+    margin-bottom:10px;
+  }
+  header h1{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:clamp(32px, 6vw, 52px);
+    margin:0 0 8px;
+    color:var(--berry-dark);
+    letter-spacing:-0.01em;
+  }
+  header p{
+    color:var(--ink-soft);
+    font-size:15px;
+    max-width:440px;
+    margin:0 auto;
+    line-height:1.5;
+  }
+  /* ---------- FILTERS ---------- */
+  .filters{
+    display:flex;
+    gap:8px;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin:20px 0 8px;
+    padding:0 16px;
+  }
+  .filter-chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    padding:7px 14px;
+    border-radius:999px;
+    border:1px solid var(--line);
+    background:transparent;
+    color:var(--ink-soft);
+    cursor:pointer;
+    transition:all .15s ease;
+  }
+  .filter-chip.active, .filter-chip:hover{
+    background:var(--berry-dark);
+    border-color:var(--berry-dark);
+    color:#fff;
+  }
+  /* ---------- GRID ---------- */
+  .grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+    gap:22px;
+    padding:28px 24px 24px;
+    max-width:1200px;
+    margin:0 auto;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 1px 2px rgba(32,38,31,0.06), 0 8px 20px rgba(32,38,31,0.05);
+    display:flex;
+    flex-direction:column;
+  }
+  .card-image{
+    aspect-ratio:4/5;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    color:rgba(255,255,255,0.85);
+    text-align:center;
+    padding:16px;
+    position:relative;
+  }
+  .card-image img{width:100%;height:100%;object-fit:cover;}
+  .card-body{
+    padding:16px 16px 18px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    flex:1;
+  }
+  .card-name{
+    font-family:'Fraunces', serif;
+    font-size:18px;
+    font-weight:600;
+    line-height:1.25;
+  }
+  /* price tag signature element */
+  .tag-row{ display:flex; align-items:center; gap:10px; }
+  .price-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:14px;
+    font-weight:600;
+    background:#F7F2E9;
+    color:var(--berry-dark);
+    border:1px dashed var(--gold);
+    border-radius:4px;
+    padding:4px 10px 4px 18px;
+    position:relative;
+    display:inline-block;
+  }
+  .price-tag::before{
+    content:'';
+    position:absolute;
+    left:6px; top:50%;
+    transform:translateY(-50%);
+    width:5px; height:5px;
+    border-radius:50%;
+    background:var(--bg);
+    border:1px solid var(--gold);
+  }
+  .sizes{ display:flex; gap:6px; flex-wrap:wrap; }
+  .size-btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    width:34px; height:34px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    background:#fff;
+    color:var(--ink);
+    cursor:pointer;
+  }
+  .size-btn.selected{
+    background:var(--berry-dark);
+    border-color:var(--berry-dark);
+    color:#fff;
+  }
+  .size-btn:disabled{
+    opacity:0.35;
+    cursor:not-allowed;
+    text-decoration:line-through;
+  }
+  .colores{ display:flex; gap:6px; flex-wrap:wrap; margin-top:2px; }
+  .color-btn{
+    width:26px; height:26px;
+    border-radius:50%;
+    border:2px solid var(--line);
+    cursor:pointer;
+    padding:0;
+  }
+  .color-btn.selected{
+    border-color:var(--berry-dark);
+    box-shadow:0 0 0 2px #fff, 0 0 0 4px var(--berry-dark);
+  }
+  .color-label{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-bottom:-4px;
+  }
+  .add-btn{
+    margin-top:auto;
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:11px 14px;
+    border-radius:9px;
+    border:none;
+    background:var(--ink);
+    color:#fff;
+    cursor:pointer;
+    transition:background .15s ease;
+  }
+  .add-btn:hover{ background:var(--berry-dark); }
+  .add-btn:disabled{
+    background:#C9C7BC;
+    cursor:not-allowed;
+  }
+  .add-btn.added{ background:var(--sage); }
+
+  /* ---------- FLOATING CART BUTTON ---------- */
+  .cart-fab{
+    position:fixed;
+    bottom:22px;
+    right:22px;
+    background:var(--berry-dark);
+    color:#fff;
+    border:none;
+    border-radius:999px;
+    padding:14px 22px;
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    cursor:pointer;
+    box-shadow:0 10px 24px rgba(110,44,53,0.35);
+    z-index:50;
+  }
+  .cart-fab .count{
+    background:rgba(255,255,255,0.25);
+    border-radius:999px;
+    padding:2px 9px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+  }
+
+  /* ---------- CART DRAWER ---------- */
+  .overlay{
+    position:fixed; inset:0;
+    background:rgba(32,38,31,0.45);
+    z-index:60;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease;
+  }
+  .overlay.open{ opacity:1; pointer-events:auto; }
+  .drawer{
+    position:fixed;
+    top:0; right:0;
+    height:100%;
+    width:min(400px, 92vw);
+    background:var(--bg);
+    z-index:70;
+    transform:translateX(100%);
+    transition:transform .25s ease;
+    display:flex;
+    flex-direction:column;
+    box-shadow:-8px 0 24px rgba(0,0,0,0.15);
+  }
+  .drawer.open{ transform:translateX(0); }
+  .drawer-header{
+    padding:22px 20px 14px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid var(--line);
+  }
+  .drawer-header h2{
+    font-family:'Fraunces', serif;
+    font-size:22px;
+    margin:0;
+    color:var(--berry-dark);
+  }
+  .drawer-close{
+    background:none; border:none; font-size:22px; cursor:pointer; color:var(--ink-soft);
+  }
+  .drawer-items{
+    flex:1;
+    overflow-y:auto;
+    padding:14px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+  }
+  .drawer-empty{
+    color:var(--ink-soft);
+    font-size:14px;
+    text-align:center;
+    margin-top:40px;
+    line-height:1.6;
+  }
+  .drawer-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:var(--card);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:14px;
+  }
+  .drawer-item .info b{ font-family:'Fraunces', serif; font-size:15px; }
+  .drawer-item .info .meta{ color:var(--ink-soft); font-size:12px; margin-top:2px; }
+  .drawer-item .remove{
+    background:none; border:none; color:var(--berry); cursor:pointer; font-size:13px;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .drawer-footer{
+    padding:16px 20px 22px;
+    border-top:1px solid var(--line);
+  }
+  .drawer-total{
+    display:flex; justify-content:space-between; align-items:center;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:15px;
+    margin-bottom:14px;
+  }
+  .drawer-total b{ font-size:19px; color:var(--berry-dark); }
+  .checkout-btn{
+    width:100%;
+    background:#25D366;
+    color:#0d3320;
+    border:none;
+    border-radius:10px;
+    padding:14px;
+    font-weight:700;
+    font-size:15px;
+    cursor:pointer;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+  .checkout-btn:disabled{ background:#C9C7BC; color:#fff; cursor:not-allowed; }
+  .checkout-note{
+    font-size:11.5px;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-top:10px;
+    line-height:1.4;
+  }
+  footer{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:12px;
+    padding:20px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="eyebrow">Catálogo · Nueva colección</div>
+  <h1>Nombre de tu marca</h1>
+  <p>Elige tus prendas y talla. Al final te llevamos directo a WhatsApp para confirmar tu pedido — sin compromiso.</p>
+</header>
+
+<div class="filters" id="filters"></div>
+<div class="grid" id="grid"></div>
+
+<button class="cart-fab" id="cartFab" onclick="openDrawer()">
+  🛍️ Ver pedido <span class="count" id="cartCount">0</span>
+</button>
+
+<div class="overlay" id="overlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="drawer">
+  <div class="drawer-header">
+    <h2>Tu pedido</h2>
+    <button class="drawer-close" onclick="closeDrawer()">×</button>
+  </div>
+  <div class="drawer-items" id="drawerItems"></div>
+  <div class="drawer-footer">
+    <div class="drawer-total">
+      <span>Total estimado</span>
+      <b id="drawerTotal">$0</b>
+    </div>
+    <button class="checkout-btn" id="checkoutBtn" onclick="hacerPedido()">
+      Hacer pedido por WhatsApp
+    </button>
+    <div class="checkout-note">Esto solo abre un mensaje de WhatsApp con tu selección. No es una compra confirmada.</div>
+  </div>
+</div>
+
+<footer>Precios en COP · Disponibilidad sujeta a inventario</footer>
+
+<script>
+/* ======================================================
+   ⚙️ CONFIGURACIÓN — edita solo esto
+   ====================================================== */
+
+// Número de WhatsApp de tu hermana, formato: código de país + número, sin + ni espacios
+const WHATSAPP_NUMERO = "573001234567"; // <-- CAMBIAR por el número real
+
+// Catálogo de productos. Copia el bloque {...} para agregar más prendas.
+const PRODUCTOS = [
+  {
+    id: 1,
+    nombre: "Blusa Bogotá",
+    categoria: "Blusas",
+    precio: 65000,
+    tallas: ["S","M","L"],
+    agotadas: ["L"],
+    color: "#8E3B46",
+    imagen: "" // pega aquí una URL de imagen si tienes, ej: "https://..."
+  },
+  {
+    id: 2,
+    nombre: "Jean recto Medellín",
+    categoria: "Jeans",
+    precio: 98000,
+    tallas: ["6","8","10","12"],
+    agotadas: [],
+    color: "#2F3E2C",
+    imagen: ""
+  },
+  {
+    id: 3,
+    nombre: "Vestido Cartagena",
+    categoria: "Vestidos",
+    precio: 120000,
+    tallas: ["S","M","L"],
+    agotadas: [],
+    color: "#B8935A",
+    imagen: ""
+  },
+  {
+    id: 4,
+    nombre: "Camisa lino Santa Marta",
+    categoria: "Blusas",
+    precio: 78000,
+    tallas: ["S","M","L","XL"],
+    agotadas: ["S"],
+    color: "#7C8A6E",
+    imagen: ""
+  },
+  {
+    id: 5,
+    nombre: "Falda plisada",
+    categoria: "Faldas",
+    precio: 70000,
+    tallas: ["S","M","L"],
+    agotadas: [],
+    color: "#6E2C35",
+    imagen: ""
+  },
+  {
+    id: 6,
+    nombre: "Jean skinny Cali",
+    categoria: "Jeans",
+    precio: 95000,
+    tallas: ["6","8","10","12"],
+    agotadas: ["6"],
+    color: "#2F3E2C",
+    imagen: ""
+  },
+  {
+    id: 7,
+    nombre: "Enterizo deportivo",
+    categoria: "Enterizos",
+    precio: 65000,
+    tallas: ["S","M","L"],
+    agotadas: [],
+    colores: ["negro","celeste","rosado","beis","cafe","verde oliva","verde seco","azul rey"],
+    color: "#1C1C1C",
+    imagen: "imagenes/en3440.jpg"
+  },
+];
+
+// Mapa de nombre de color -> código hex, para pintar los círculos de color
+const COLORES_HEX = {
+  "negro": "#1C1C1C",
+  "celeste": "#8ECBE6",
+  "rosado": "#E8A0BF",
+  "beis": "#D8C3A5",
+  "cafe": "#6F4E37",
+  "verde oliva": "#6B6E3A",
+  "verde seco": "#8A9A5B",
+  "azul rey": "#1E3A8A",
+  "chocolate": "#4A2C1D",
+  "vinotinto": "#6E1423",
+  "blanco": "#F5F5F0",
+  "habano": "#A9784F",
+  "verde": "#7C8A6E",
+  "azul": "#2F4F8F",
+  "gris": "#9C9C94"
+};
+
+/* ======================================================
+   No necesitas editar debajo de esta línea
+   ====================================================== */
+
+let filtroActivo = "Todas";
+let carrito = []; // {productoId, talla, color, cantidad}
+const seleccion = {}; // productoId -> { talla, color } elegidos temporalmente
+
+function formatoCOP(n){
+  return "$" + n.toLocaleString("es-CO");
+}
+
+function categorias(){
+  const set = new Set(PRODUCTOS.map(p => p.categoria));
+  return ["Todas", ...set];
+}
+
+function renderFiltros(){
+  const cont = document.getElementById("filters");
+  cont.innerHTML = "";
+  categorias().forEach(cat => {
+    const btn = document.createElement("button");
+    btn.className = "filter-chip" + (cat === filtroActivo ? " active" : "");
+    btn.textContent = cat;
+    btn.onclick = () => { filtroActivo = cat; renderFiltros(); renderGrid(); };
+    cont.appendChild(btn);
+  });
+}
+
+function renderGrid(){
+  const grid = document.getElementById("grid");
+  grid.innerHTML = "";
+  const lista = filtroActivo === "Todas" ? PRODUCTOS : PRODUCTOS.filter(p => p.categoria === filtroActivo);
+
+  lista.forEach(p => {
+    const card = document.createElement("div");
+    card.className = "card";
+
+    const img = document.createElement("div");
+    img.className = "card-image";
+    img.style.background = p.color;
+    if(p.imagen){
+      const image = document.createElement("img");
+      image.src = p.imagen;
+      img.appendChild(image);
+    } else {
+      img.textContent = p.nombre;
+    }
+
+    const body = document.createElement("div");
+    body.className = "card-body";
+
+    const sel = seleccion[p.id] || { talla: null, color: null };
+
+    const sizesRow = p.tallas.map(t => {
+      const disabled = p.agotadas.includes(t);
+      const selected = sel.talla === t;
+      return `<button class="size-btn ${selected ? 'selected' : ''}" ${disabled ? 'disabled' : ''}
+        onclick="elegirTalla(${p.id}, '${t}')">${t}</button>`;
+    }).join("");
+
+    const tieneColores = Array.isArray(p.colores) && p.colores.length > 0;
+    const colorsRow = tieneColores ? p.colores.map(c => {
+      const selected = sel.color === c;
+      const hex = COLORES_HEX[c] || "#999";
+      return `<button class="color-btn ${selected ? 'selected' : ''}" style="background:${hex}"
+        title="${c}" onclick="elegirColor(${p.id}, '${c}')"></button>`;
+    }).join("") : "";
+
+    const listoParaAgregar = sel.talla && (!tieneColores || sel.color);
+
+    body.innerHTML = `
+      <div class="card-name">${p.nombre}</div>
+      <div class="tag-row"><span class="price-tag">${formatoCOP(p.precio)}</span></div>
+      <div class="sizes">${sizesRow}</div>
+      ${tieneColores ? `<div class="color-label">Color${sel.color ? ': ' + sel.color : ''}</div><div class="colores">${colorsRow}</div>` : ""}
+      <button class="add-btn" id="add-${p.id}" onclick="agregarCarrito(${p.id})" ${!listoParaAgregar ? 'disabled' : ''}>
+        Agregar al pedido
+      </button>
+    `;
+
+    card.appendChild(img);
+    card.appendChild(body);
+    grid.appendChild(card);
+  });
+}
+
+function elegirTalla(id, talla){
+  seleccion[id] = seleccion[id] || { talla: null, color: null };
+  seleccion[id].talla = talla;
+  renderGrid();
+}
+
+function elegirColor(id, color){
+  seleccion[id] = seleccion[id] || { talla: null, color: null };
+  seleccion[id].color = color;
+  renderGrid();
+}
+
+function agregarCarrito(id){
+  const p = PRODUCTOS.find(p => p.id === id);
+  const sel = seleccion[id];
+  if(!sel || !sel.talla) return;
+  if(Array.isArray(p.colores) && p.colores.length > 0 && !sel.color) return;
+  const talla = sel.talla;
+  const color = sel.color || null;
+  const existente = carrito.find(c => c.productoId === id && c.talla === talla && c.color === color);
+  if(existente){
+    existente.cantidad += 1;
+  } else {
+    carrito.push({ productoId: id, talla, color, cantidad: 1 });
+  }
+  const btn = document.getElementById(`add-${id}`);
+  btn.textContent = "Agregado ✓";
+  btn.classList.add("added");
+  setTimeout(() => {
+    btn.textContent = "Agregar al pedido";
+    btn.classList.remove("added");
+  }, 900);
+  actualizarCarritoUI();
+}
+
+function quitarDelCarrito(index){
+  carrito.splice(index, 1);
+  actualizarCarritoUI();
+}
+
+function totalCarrito(){
+  return carrito.reduce((sum, item) => {
+    const p = PRODUCTOS.find(p => p.id === item.productoId);
+    return sum + (p.precio * item.cantidad);
+  }, 0);
+}
+
+function cantidadTotal(){
+  return carrito.reduce((sum, item) => sum + item.cantidad, 0);
+}
+
+function actualizarCarritoUI(){
+  document.getElementById("cartCount").textContent = cantidadTotal();
+  document.getElementById("drawerTotal").textContent = formatoCOP(totalCarrito());
+
+  const cont = document.getElementById("drawerItems");
+  cont.innerHTML = "";
+
+  if(carrito.length === 0){
+    cont.innerHTML = `<div class="drawer-empty">Tu pedido está vacío.<br>Explora el catálogo y agrega tus prendas favoritas.</div>`;
+  } else {
+    carrito.forEach((item, index) => {
+      const p = PRODUCTOS.find(p => p.id === item.productoId);
+      const div = document.createElement("div");
+      div.className = "drawer-item";
+      const colorTxt = item.color ? ` · Color ${item.color}` : "";
+      div.innerHTML = `
+        <div class="info">
+          <b>${p.nombre}</b>
+          <div class="meta">Talla ${item.talla}${colorTxt} · x${item.cantidad} · ${formatoCOP(p.precio * item.cantidad)}</div>
+        </div>
+        <button class="remove" onclick="quitarDelCarrito(${index})">Quitar</button>
+      `;
+      cont.appendChild(div);
+    });
+  }
+
+  document.getElementById("checkoutBtn").disabled = carrito.length === 0;
+}
+
+function openDrawer(){
+  document.getElementById("drawer").classList.add("open");
+  document.getElementById("overlay").classList.add("open");
+}
+function closeDrawer(){
+  document.getElementById("drawer").classList.remove("open");
+  document.getElementById("overlay").classList.remove("open");
+}
+
+function hacerPedido(){
+  if(carrito.length === 0) return;
+  let mensaje = "Hola, podrías porfa ayudarme con este pedido:%0A%0A";
+  carrito.forEach(item => {
+    const p = PRODUCTOS.find(p => p.id === item.productoId);
+    const colorTxt = item.color ? ` (${item.color})` : "";
+    mensaje += `• ${p.nombre} - Talla ${item.talla}${colorTxt} x${item.cantidad} - ${formatoCOP(p.precio * item.cantidad)}%0A`;
+  });
+  mensaje += `%0ATotal estimado: ${formatoCOP(totalCarrito())}`;
+
+  const url = `https://wa.me/${WHATSAPP_NUMERO}?text=${mensaje}`;
+  window.open(url, "_blank");
+}
+
+renderFiltros();
+renderGrid();
+actualizarCarritoUI();
+</script>
+
+</body>
+</html>
