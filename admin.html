@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Ingry Shop</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Work+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{
+    --bg:#EDECE6;
+    --card:#FFFFFF;
+    --ink:#20261F;
+    --ink-soft:#5B5F55;
+    --berry:#8E3B46;
+    --berry-dark:#6E2C35;
+    --gold:#B8935A;
+    --sage:#7C8A6E;
+    --line:#DAD8CC;
+    --radius:14px;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Work Sans', sans-serif;
+    padding:24px;
+  }
+  h1{
+    font-family:'Fraunces', serif;
+    color:var(--berry-dark);
+    text-align:center;
+    margin-bottom:4px;
+  }
+  .subtitulo{
+    text-align:center;
+    color:var(--ink-soft);
+    font-size:14px;
+    margin-bottom:28px;
+  }
+  .card{
+    background:var(--card);
+    border-radius:var(--radius);
+    padding:24px;
+    max-width:480px;
+    margin:0 auto 24px;
+    box-shadow:0 4px 16px rgba(32,38,31,0.08);
+  }
+  label{
+    display:block;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    margin:14px 0 6px;
+  }
+  input, select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid var(--line);
+    font-family:'Work Sans', sans-serif;
+    font-size:14px;
+    background:#fff;
+  }
+  .fila{ display:flex; gap:12px; }
+  .fila > div{ flex:1; }
+  button{
+    font-family:'Work Sans', sans-serif;
+    font-weight:600;
+    font-size:14px;
+    padding:12px 16px;
+    border-radius:9px;
+    border:none;
+    cursor:pointer;
+  }
+  .btn-primario{
+    background:var(--berry-dark);
+    color:#fff;
+    width:100%;
+    margin-top:20px;
+  }
+  .btn-primario:hover{ background:var(--berry); }
+  .btn-secundario{
+    background:transparent;
+    color:var(--ink-soft);
+    border:1px solid var(--line);
+  }
+  .btn-peligro{
+    background:#fff;
+    color:var(--berry);
+    border:1px solid var(--berry);
+    font-size:12px;
+    padding:8px 12px;
+  }
+  .mensaje{
+    text-align:center;
+    font-size:13px;
+    margin-top:12px;
+    min-height:18px;
+  }
+  .mensaje.error{ color:var(--berry); }
+  .mensaje.ok{ color:var(--sage); }
+
+  .oculto{ display:none; }
+
+  .top-bar{
+    max-width:900px;
+    margin:0 auto 20px;
+    display:flex;
+    justify-content:flex-end;
+  }
+
+  .lista{
+    max-width:900px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(220px, 1fr));
+    gap:16px;
+  }
+  .item-card{
+    background:var(--card);
+    border-radius:var(--radius);
+    overflow:hidden;
+    box-shadow:0 2px 8px rgba(32,38,31,0.06);
+  }
+  .item-img{
+    width:100%;
+    aspect-ratio:4/5;
+    object-fit:cover;
+    background:var(--line);
+  }
+  .item-body{ padding:14px; }
+  .item-nombre{ font-family:'Fraunces', serif; font-weight:600; font-size:16px; }
+  .item-precio{ font-family:'IBM Plex Mono', monospace; font-size:13px; color:var(--berry-dark); margin:4px 0 10px; }
+  .item-acciones{ display:flex; gap:8px; }
+  .item-acciones button{ flex:1; font-size:12px; padding:8px; }
+
+  .form-panel{ max-width:520px; }
+</style>
+</head>
+<body>
+
+<h1>Ingry Shop</h1>
+<div class="subtitulo">Panel de administración del catálogo</div>
+
+<!-- ============ LOGIN ============ -->
+<div id="vistaLogin" class="card">
+  <label>Correo</label>
+  <input type="email" id="loginEmail" placeholder="tu@correo.com">
+  <label>Contraseña</label>
+  <input type="password" id="loginPassword" placeholder="••••••••">
+  <button class="btn-primario" onclick="iniciarSesion()">Iniciar sesión</button>
+  <div id="loginMensaje" class="mensaje"></div>
+</div>
+
+<!-- ============ PANEL (oculto hasta iniciar sesión) ============ -->
+<div id="vistaPanel" class="oculto">
+
+  <div class="top-bar">
+    <button class="btn-secundario" onclick="cerrarSesion()">Cerrar sesión</button>
+  </div>
+
+  <div class="card form-panel">
+    <div id="formTitulo" style="font-family:'Fraunces',serif; font-size:18px; color:var(--berry-dark); margin-bottom:6px;">Agregar prenda</div>
+
+    <label>Nombre</label>
+    <input type="text" id="fNombre" placeholder="Ej: Ibiza">
+
+    <label>Sección / Categoría</label>
+    <input type="text" id="fCategoria" placeholder="Ej: Enterizos">
+
+    <div class="fila">
+      <div>
+        <label>Precio (COP)</label>
+        <input type="number" id="fPrecio" placeholder="65000">
+      </div>
+      <div>
+        <label>Tallas (separadas por coma)</label>
+        <input type="text" id="fTallas" placeholder="S, M, L o Única">
+      </div>
+    </div>
+
+    <label>Colores (separados por coma)</label>
+    <input type="text" id="fColores" placeholder="negro, celeste, rosado">
+
+    <label>Foto de la prenda</label>
+    <input type="file" id="fImagen" accept="image/*">
+    <div id="previewActual" style="font-size:12px; color:var(--ink-soft); margin-top:6px;"></div>
+
+    <button class="btn-primario" id="btnGuardar" onclick="guardarProducto()">Guardar prenda</button>
+    <button class="btn-secundario" id="btnCancelar" style="width:100%; margin-top:8px;" onclick="cancelarEdicion()">Cancelar edición</button>
+    <div id="formMensaje" class="mensaje"></div>
+  </div>
+
+  <div id="lista" class="lista"></div>
+</div>
+
+<script>
+const SUPABASE_URL = "https://upfglhzvwsdbjmosuscw.supabase.co";
+const SUPABASE_KEY = "sb_publishable_nRrAlM6vWRgCKI4tEdiVDQ_6AU6Sv0O";
+const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let editandoId = null; // null = modo "agregar", número = modo "editar"
+
+/* ---------- LOGIN ---------- */
+
+async function iniciarSesion(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const password = document.getElementById('loginPassword').value;
+  const msg = document.getElementById('loginMensaje');
+  msg.textContent = "Ingresando...";
+  msg.className = "mensaje";
+
+  const { error } = await supabaseClient.auth.signInWithPassword({ email, password });
+
+  if(error){
+    msg.textContent = "Correo o contraseña incorrectos.";
+    msg.className = "mensaje error";
+    return;
+  }
+  mostrarPanel();
+}
+
+async function cerrarSesion(){
+  await supabaseClient.auth.signOut();
+  document.getElementById('vistaPanel').classList.add('oculto');
+  document.getElementById('vistaLogin').classList.remove('oculto');
+}
+
+async function mostrarPanel(){
+  document.getElementById('vistaLogin').classList.add('oculto');
+  document.getElementById('vistaPanel').classList.remove('oculto');
+  await cargarLista();
+}
+
+/* Revisa si ya hay sesión iniciada al cargar la página */
+async function revisarSesionInicial(){
+  const { data } = await supabaseClient.auth.getSession();
+  if(data.session){
+    await mostrarPanel();
+  }
+}
+
+/* ---------- LISTA DE PRODUCTOS ---------- */
+
+async function cargarLista(){
+  const { data, error } = await supabaseClient
+    .from('productos')
+    .select('*')
+    .order('id', { ascending: true });
+
+  const cont = document.getElementById('lista');
+  cont.innerHTML = "";
+
+  if(error){
+    cont.innerHTML = "<p>Error cargando productos.</p>";
+    return;
+  }
+
+  data.forEach(p => {
+    const div = document.createElement('div');
+    div.className = 'item-card';
+    div.innerHTML = `
+      <img class="item-img" src="${p.imagen_url || ''}" onerror="this.style.opacity=0.3">
+      <div class="item-body">
+        <div class="item-nombre">${p.nombre}</div>
+        <div class="item-precio">$${Number(p.precio).toLocaleString('es-CO')} · ${p.categoria}</div>
+        <div class="item-acciones">
+          <button class="btn-secundario" onclick='cargarParaEditar(${JSON.stringify(p)})'>Editar</button>
+          <button class="btn-peligro" onclick="borrarProducto(${p.id})">Eliminar</button>
+        </div>
+      </div>
+    `;
+    cont.appendChild(div);
+  });
+}
+
+/* ---------- AGREGAR / EDITAR ---------- */
+
+function cargarParaEditar(p){
+  editandoId = p.id;
+  document.getElementById('formTitulo').textContent = "Editando: " + p.nombre;
+  document.getElementById('fNombre').value = p.nombre;
+  document.getElementById('fCategoria').value = p.categoria;
+  document.getElementById('fPrecio').value = p.precio;
+  document.getElementById('fTallas').value = (p.tallas || []).join(', ');
+  document.getElementById('fColores').value = (p.colores || []).join(', ');
+  document.getElementById('previewActual').textContent = "Foto actual: " + (p.imagen_url ? "ya tiene una" : "sin foto") + ". Sube una nueva solo si quieres cambiarla.";
+  document.getElementById('btnGuardar').textContent = "Actualizar prenda";
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function cancelarEdicion(){
+  editandoId = null;
+  document.getElementById('formTitulo').textContent = "Agregar prenda";
+  document.getElementById('fNombre').value = "";
+  document.getElementById('fCategoria').value = "";
+  document.getElementById('fPrecio').value = "";
+  document.getElementById('fTallas').value = "";
+  document.getElementById('fColores').value = "";
+  document.getElementById('fImagen').value = "";
+  document.getElementById('previewActual').textContent = "";
+  document.getElementById('btnGuardar').textContent = "Guardar prenda";
+}
+
+async function guardarProducto(){
+  const msg = document.getElementById('formMensaje');
+  const nombre = document.getElementById('fNombre').value.trim();
+  const categoria = document.getElementById('fCategoria').value.trim();
+  const precio = parseInt(document.getElementById('fPrecio').value, 10);
+  const tallas = document.getElementById('fTallas').value.split(',').map(s => s.trim()).filter(Boolean);
+  const colores = document.getElementById('fColores').value.split(',').map(s => s.trim()).filter(Boolean);
+  const archivo = document.getElementById('fImagen').files[0];
+
+  if(!nombre || !categoria || !precio || tallas.length === 0){
+    msg.textContent = "Completa al menos nombre, categoría, precio y tallas.";
+    msg.className = "mensaje error";
+    return;
+  }
+
+  msg.textContent = "Guardando...";
+  msg.className = "mensaje";
+
+  let imagen_url = null;
+
+  if(archivo){
+    const nombreArchivo = `${Date.now()}-${archivo.name.replace(/\s+/g, '-')}`;
+    const { error: errorSubida } = await supabaseClient
+      .storage
+      .from('productos-imagenes')
+      .upload(nombreArchivo, archivo);
+
+    if(errorSubida){
+      msg.textContent = "Error subiendo la foto: " + errorSubida.message;
+      msg.className = "mensaje error";
+      return;
+    }
+
+    const { data: urlData } = supabaseClient
+      .storage
+      .from('productos-imagenes')
+      .getPublicUrl(nombreArchivo);
+
+    imagen_url = urlData.publicUrl;
+  }
+
+  const registro = {
+    nombre, categoria, precio, tallas, colores,
+    color_fondo: "#8E3B46"
+  };
+  if(imagen_url) registro.imagen_url = imagen_url;
+
+  let resultado;
+  if(editandoId){
+    resultado = await supabaseClient.from('productos').update(registro).eq('id', editandoId);
+  } else {
+    resultado = await supabaseClient.from('productos').insert(registro);
+  }
+
+  if(resultado.error){
+    msg.textContent = "Error guardando: " + resultado.error.message;
+    msg.className = "mensaje error";
+    return;
+  }
+
+  msg.textContent = "¡Guardado con éxito!";
+  msg.className = "mensaje ok";
+  cancelarEdicion();
+  await cargarLista();
+}
+
+async function borrarProducto(id){
+  if(!confirm("¿Seguro que quieres eliminar esta prenda del catálogo?")) return;
+  const { error } = await supabaseClient.from('productos').delete().eq('id', id);
+  if(error){
+    alert("Error eliminando: " + error.message);
+    return;
+  }
+  await cargarLista();
+}
+
+revisarSesionInicial();
+</script>
+
+</body>
+</html>
